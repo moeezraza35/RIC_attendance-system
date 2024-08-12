@@ -1,0 +1,200 @@
+{% extends "dashboard.html" %}
+{% block title %}Staf{% endblock %}
+{% block style %}
+<style>
+    .eyebtn{
+        background: none;
+        border: none;
+        width: 30px;
+        background-image: url("/static/icons/eyebtn.svg");
+        background-size: 30px 30px;
+    }
+    .pre{
+        border-radius: 1px;
+        width: 213px;
+        overflow: hidden;
+        height: 30px;
+        margin: 0%;
+        margin-right: 0%;
+        padding: 0%;
+        border: 1px solid rgb(112, 112, 112);
+    }
+    .pre *{
+        height: 28px;
+        margin: 0%;
+        padding: 0%;
+        vertical-align: middle;
+        border: none;
+    }
+    td{
+        width: 229px;
+    }
+    select, input[type="text"], input[type="password"], input[type="number"]{
+        width: 150px;
+        height: 30px;
+        border-color: gray;
+        border-style: solid;
+        border-width: 1px;
+    }
+    input:disabled{
+        border: 1px solid silver;
+    }
+</style>
+{% endblock %}
+{% block toggeler %}
+<button class="navbar-toggler" type="button" onclick="show_hide_aside()">
+    <span class="navbar-toggler-icon"></span>
+</button>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="/{{ usrid }}#manage">Manage</a></li>
+    {% block addbreadcrumb %}
+<li class="breadcrumb-item active" aria-current="page">Staf</li>
+    {% endblock %}
+{% endblock %}
+{% block aside %}
+<aside>
+    <h4>Option</h4><hr/>
+    <p class="selected_sec">
+        <a href="/{{ usrid }}/manage/staf"><img src="/static/icons/manageIcon.svg">Manage</a>
+    </p><hr/>
+    <p>
+        <a href="/{{ usrid }}/manage/staf/attendance"><img src="/static/icons/attendanceIcom.svg">Update Attendance</a>
+    </p><hr/>
+    <p>
+        <a href="/{{ usrid }}/manage/staf/report"><img src="/static/icons/report.svg">Attendance report</a>
+        <hr/>
+    </p>
+</aside>
+{% endblock %}
+{% block content %}
+<main class="sm-cont">
+    <div class="alert alert-primary">
+        <h1>Staff</h1>
+    </div>
+    <div class="main">
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th colspan="2">Password</th>
+                <th>Designation</th>
+                <th>status</th>
+                <th>Option</th>
+            </tr>
+            {% for member in staf %}
+            <tr>
+                <form action="/{{ usrid }}/manage/staf/update/{{ member[0] }}" method="POST">
+                    <td>
+                        <input type="text" value="{{ member[0] }}" disabled/>
+                    </td>
+                {% if usrid == member[0]|string %}
+                    <td>
+                        <input type="text" value="{{ member[1] }}" disabled/>
+                    </td>
+                    <td>
+                        <input type="password" value="{{ member[2] }}" id="paswd{{ member[0] }}" disabled/>
+                    </td>
+                    <td>
+                        <input type="button" value="" class="eyebtn" onclick="show('paswd{{ member[0] }}')"/>
+                    </td>
+                    <td>
+                        <input type="text" value="{% for post in posts %}{% if post[0] == member[3] %}{{ post[1] }}{% endif %}{% endfor %}" disabled/>
+                    </td>
+                    <td>
+                        <input type="text" value="{{ member[4] }}" disabled/>
+                    </td>
+                    <td>-</td>
+
+                {% else %}
+                    <td>
+                        <input type="text" name="name" value="{{ member[1] }}"/>
+                    </td>
+                    <td>
+                        <input type="password" name="password" value="{{ member[2] }}" id="paswd{{ member[0] }}"/>
+                    </td>
+                    <td>
+                        <input type="button" class="eyebtn" onclick="show('paswd{{ member[0] }}')"/>
+                    </td>
+                    <td>
+                        <select name="post" id="post{{ member[0] }}">
+                            {% for post in posts %}
+                            <option value="{{ post[0] }}" {% if post[0] == member[3] %} selected  {% endif %}>
+                                {{ post[1] }}
+                            </option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="status" id="status{{ member[0] }}">
+                            <option value="Permanent" {% if member[4] == "Permanent" %}selected{% endif %}>
+                                Permanent
+                            </option>
+                            <option value="Visiting" {% if member[4] == "Visiting" %}selected{% endif %}>
+                                Visting
+                            </option>
+                            <option value="Administration" {% if member[4] == "Administration" %}selected{% endif %}>
+                                Administration
+                            </option>
+                        </select>
+                    </td>
+                    <td>
+                        <pre><input type="submit" class="btn btn-primary btn-sm" value="Update"> <a href="/{{ usrid }}/manage/staf/delete/{{ member[0] }}" class="btn btn-danger btn-sm">Delete</a></pre>
+                    </td>
+
+                {% endif %}
+                </form>
+            </tr>
+            {% endfor %}
+            <tr>
+                <form action="/{{ usrid }}/manage/staf/insert" method="post">
+                    <td>
+                        <input type="number" name="id" id="id" placeholder="member Id"/>
+                    </td>
+                    <td>
+                        <input type="text" name="name" id="name" placeholder="Name"/>
+                    </td>
+                    <td>
+                        <input type="password" name="password" id="paswd"/>
+                    </td>
+                    <td>
+                        <input type="button" value="" class="eyebtn" onclick="show('paswd')"/>
+                    </td>
+                    <td>
+                        <select name="post" id="postInsert">
+                            <option value="None">Not selected</option>
+                            {% for post in posts %}
+                            <option value="{{ post[0] }}">{{ post[1] }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <select name="status" id="statusInsert">
+                            <option value="Permanent">Permanent</option>
+                            <option value="Visiting">Visiting</option>
+                            <option value="Administration">Administration</option>
+                        </select>
+                    </td>
+                    <td>
+                        <input type="submit" value="Insert" class="btn btn-primary btn-sm"/>
+                    </td>
+                </form>
+            </tr>
+        </table>
+    </div>
+</main>
+<script>
+    function show(id){
+        if(document.getElementById(id).type=="text"){
+            document.getElementById(id).type = "password";
+        }
+        else{
+            document.getElementById(id).type = "text";
+        };
+    };
+</script>
+{% block script %}
+<script src="/static/Aside.js"></script>
+{% endblock %}
+{% endblock %}

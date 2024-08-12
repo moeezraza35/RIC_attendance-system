@@ -1,0 +1,133 @@
+{% extends "dashboard.html" %}
+{% block title %}Attendance{% endblock %}
+{% block style %}
+<style>
+    .left-align{
+        text-align: left;
+        padding: 10px;
+    }
+    .left-align *{
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
+{% block toggeler %}
+<button class="navbar-toggler" type="button" onclick="show_hide_aside()">
+    <span class="navbar-toggler-icon"></span>
+</button>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+{% if students %}
+<li class="breadcrumb-item"><a href="/{{ usrid }}/students/attendance">Attendance</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ section_name }}</li>
+{% else %}
+<li class="breadcrumb-item active" aria-current="page">Attendance</li>
+{% endif %}
+{% endblock %}
+{% block aside %}
+<aside>
+    <h4>Sections</h4><hr/>
+    {% for section in sections %}
+        {% if section_id == section[0] | string %}
+    <p class="selected_sec">
+        {% else %}
+    <p>
+    {% endif %}
+        <a href="/{{ usrid }}/students/attendance/report?section={{ section[0] }}">
+            {{ section[0] }}. {{ section[3] }} {{ section[1] }} {{ section[2] }}
+        </a>
+    </p><hr/>
+    {% endfor %}
+    <br><hr>
+    <p>
+        <a href="/{{ usrid }}/students/attendance">
+            Mark Attendance
+        </a>
+    </p><hr>
+    <p class="selected_sec">
+        <a href="/{{ usrid }}/students/attendance/report">
+            Attendance Report
+        </a>
+    </p>
+</aside>
+{% endblock %}
+{% block content %}
+<main class="sm-cont">
+    <div class="navbar alert alert-primary navbar-dark">
+        <h1 class="d-inline-block">Students Report</h1>
+    </div>
+    {% if section_id %}
+    <table class="table">
+        <tr>
+            <th>Date From:</th>
+            <td><select id="datefrom" class="form-select">
+                <option value="">Select Date</option>
+                {% for dates in dateList %}
+                <option value="{{ dates }}" >{{ dates }}</option>
+                {% endfor %}
+            </select></td>
+            <th>Date To:</th>
+            <td><select id="dateto" class="form-select">
+                <option value="">Select Date</option>
+                {% for dates in dateList %}
+                <option value="{{ dates }}">{{ dates }}</option>
+                {% endfor %}
+            </select></td>
+            <td><input type="button" id="getDate" value="Get Report" class="btn btn-primary"></td>
+        </tr>
+    </table>
+    {% if attendances %}
+    <table class="table table-striped-columns">
+        <tr>
+            <th rowspan="2">Student ID</th>
+            <th rowspan="2">Student Name</th>
+            <th rowspan="2">Father Name</th>
+            {% for date in dates %}
+                <th colspan="{{ date[-1] }}">{{ date[0:-1] }}</th>
+            {% endfor %}
+            
+        </tr>
+        <tr>
+            {% for attendance in attendances %}
+            {% for lecture in lectures %}
+            {% if lecture[0] == attendance[1] %}
+            <th>{{ lecture[5] }}</th>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </tr>
+        {% for student in students %}
+        <tr>
+            <td>
+                {{ fall }}LNB{{ student[0] }}
+            </td>
+            <td>{{ student[1] }}</td>
+            <td>{{ student[2] }}</td>
+            {% for attendance in attendances %}
+            {% for stud_rec in stud_att %}
+            {% if stud_rec[2] == student[0] and stud_rec[1] == attendance[0] %}
+            <td>{{ stud_rec[3] }}</td>
+            {% endif %}
+            {% endfor %}
+            {% endfor %}
+        </tr>
+        {% endfor %}
+    </table>
+    <div>
+        <a class="btn btn-success btn-lg" href="/{{ usrid }}/students/attendance/{{ section_id }}/{{ dates[0][0:-1] }}/{{ dates[-1][0:-1] }}/print" target="_blank">Export PDF</a>
+    </div>
+    {% endif %}
+    {% endif %}
+</main>
+<script src="/static/Aside.js"></script>
+<script>
+    document.getElementById("getDate").addEventListener("click", function(){
+        var dateFrom = document.getElementById("datefrom");
+        var dateTo = document.getElementById("dateto");
+        if (dateFrom.value != "" && dateTo.value != ""){
+            open("/{{ usrid }}/students/attendance/report?section={{ section_id }}&&datefrom="+dateFrom.value+"&&dateto="+dateTo.value,"_self");
+        }
+    })
+</script>
+{% endblock %}

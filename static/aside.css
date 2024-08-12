@@ -1,0 +1,75 @@
+/* Aside a side bar or pannel */
+
+aside{
+    width: 20%;
+    float: left;
+    overflow-y: auto;
+}
+aside h4{
+    text-align: center;
+}
+aside p{
+    padding: 0%;margin: 0%;
+}
+aside p a{
+    display: inline-block;
+    padding: 10px;
+    width: 100%;
+    text-decoration: none;
+}
+aside a img{
+    height: 30px;
+}
+aside p a:hover{
+    background-color: rgb(230, 230, 230);
+}
+aside p .sub, aside .selected_sec .sub{
+    color: #0066cc;
+    padding: 2px;
+    padding-left: 20px;
+    background-color: rgb(240,240,240);
+}
+aside .selected_sec .sub:hover{
+    background-color: rgb(230, 230, 230);
+}
+.selected_sec a{
+    background-color: #234d83;
+    color: white;
+}
+.selected_sec a:hover{
+    background-color: #26456e;
+}
+@media screen and (min-width: 992px) {
+    aside{display: block;}
+    .sm-cont{margin-left: 20%;}
+    .divider button{display: none;}
+}
+@media screen and (max-width:991px) {
+    aside{
+        z-index: 1;
+        position: absolute;
+        display: none;
+        width: 50%;
+        border-radius: 0px;
+        border-top-right-radius: 10px;
+        background-color: white;
+        height: calc(100vh - 81px);
+        top: 81px;
+        box-shadow: 3px 0px 10px rgb(70, 70, 70);
+    }
+    .sm-cont{
+        margin: auto 5%;
+        margin-top: 10px;
+    }
+    .divider button{
+        box-shadow: -2px 1px 7px rgb(0, 0, 124);
+        border-color: #1a3c69;
+        display: inline-block;
+        margin-right: 10px;
+    }
+}
+@media screen and (max-width:593px) {
+    aside{
+        width: 288px;
+    }
+}

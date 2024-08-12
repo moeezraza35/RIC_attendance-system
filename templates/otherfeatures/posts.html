@@ -1,0 +1,78 @@
+{% extends "dashboard.html" %}
+{% block title %}Posts{% endblock %}
+{% block style %}
+<style>
+    .already{
+        accent-color: rgb(58, 145, 58);
+    }
+</style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="/{{ usrid }}#manage">Manage</a></li>
+<li class="breadcrumb-item active" aria-current="page">Privileges</li>
+{% endblock %}
+{% block content %}
+<main class="container-sm">
+    <div class="alert alert-primary">
+        <h1>Privileges</h1>
+    </div>
+    <div class="main">
+        <table class="table">
+            <tr>
+                {% for heading in headings %}
+                <th>{{ heading }}</th>
+                {% endfor %}
+                <th>Option</th>
+            </tr>
+            {% for x in posts %}
+            <tr>
+                <form action="/{{ usrid }}/manage/posts/update/{{ x[0] }}" method="POST">
+                <th>
+                    {{ x[1] }}
+                </th>
+                <td>
+                    <input type="checkbox" name="access" id="x[0]_attendance" value="attendance" {% if x[2] == 1 %}class="already" checked{% endif %}/>
+                </td>
+                <td>
+                    <input type="checkbox" name="access" id="x[0]_examination" value="examination" {% if x[3] == 1 %}class="already" checked{% endif %}/>
+                </td>
+                <td>
+                    <input type="checkbox" name="access" id="x[0]_management" value="management" {% if x[4] == 1 %}class="already" checked{% endif %}/>
+                </td>
+                <td>
+                    <input type="checkbox" name="access" id="x[0]_post" value="post" {% if x[5] == 1 %}class="already" checked{% endif %}/>
+                </td>
+                <td>
+                    <input type="checkbox" name="access" id="x[0]_staff" value="staff" {% if x[6] == 1 %}class="already" checked{% endif %}/>
+                </td>
+                <td>
+                    {% if x[1] != "Principal" %}
+                    <pre><input type="submit" value="Update" class="btn btn-primary btn-sm"/> <a href="/{{ usrid }}/manage/posts/delete/{{ x[0] }}" class="btn btn-danger btn-sm">Delete</a></pre>
+                    {% else %}
+                    -
+                    {% endif %}
+                </td>
+                </form>
+            </tr>
+            {% endfor %}
+            <tr>
+                <form action="/{{ usrid }}/manage/posts/insert" method="POST">
+                {% for heading in headings %}
+                <td>
+                    {% if heading == 'Posts' %}
+                    <input type="text" name="post" id="post" placeholder="Designation . . ."/>
+                    {% else %}
+                    <input type="checkbox" name="access" value="{{ heading }}" id="{{ heading }}"/>
+                    {% endif %}
+                </td>
+                {% endfor %}
+                <td>
+                    <input type="submit" value="Insert" class="btn btn-primary btn-sm"/>
+                </td>
+                </form>
+            </tr>
+        </table>
+    </div>
+</main>
+{% endblock %}

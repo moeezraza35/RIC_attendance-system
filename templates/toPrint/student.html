@@ -1,0 +1,74 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            padding: 20px;
+        }
+        h1{
+            font-size: 46px;
+            text-align: center;
+        }
+        h2{
+            font-size: 38px;
+        }
+        table{
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+        }
+        table, table *{
+            border-style: solid;
+            border-width: 1px;
+        }
+        th, td{
+            font-size: 18px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <main>
+        <h1>Riphah International Colleges Thokar campus</h1>
+        <h2>Section : {{ sec_name }}</h2>
+        <table border=1>
+            <tr>
+                <th rowspan="2">Student ID</th>
+                <th rowspan="2">Student Name</th>
+                <th rowspan="2">Father Name</th>
+                {% for date in dates %}
+                    <th colspan="{{ date[-1] }}">{{ date[0:-1] }}</th>
+                {% endfor %}
+            </tr>
+            <tr>
+                {% for attendance in attendances %}
+                {% for lecture in lectures %}
+                {% if lecture[0] == attendance[1] %}
+                <th>{{ lecture[5] }}</th>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </tr>
+            {% for student in students %}
+            <tr>
+                <td>
+                    {{ fall }}LNB{{ student[0] }}
+                </td>
+                <td>{{ student[1] }}</td>
+                <td>{{ student[2] }}</td>
+                {% for attendance in attendances %}
+                {% for stud_rec in stud_att %}
+                {% if stud_rec[2] == student[0] and stud_rec[1] == attendance[0] %}
+                <td>{{ stud_rec[3] }}</td>
+                {% endif %}
+                {% endfor %}
+                {% endfor %}
+            </tr>
+            {% endfor %}
+        </table>
+    </main>
+</body>
+</html>

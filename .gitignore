@@ -1,0 +1,7 @@
+venv/
+/backup.sql
+__pycache__
+bootstrap/
+thumbnails/
+report.csv
+students.csv

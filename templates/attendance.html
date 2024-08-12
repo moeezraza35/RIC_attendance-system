@@ -1,0 +1,181 @@
+{% extends "dashboard.html" %}
+{% block title %}Attendance{% endblock %}
+{% block style %}
+<style>
+    .left-align{
+        text-align: left;
+        padding: 10px;
+    }
+    .left-align *{
+        vertical-align: middle;
+    }
+</style>
+{% endblock %}
+{% block toggeler %}
+<button class="navbar-toggler" type="button" onclick="show_hide_aside()">
+    <span class="navbar-toggler-icon"></span>
+</button>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+{% if students %}
+<li class="breadcrumb-item"><a href="/{{ usrid }}/students/attendance">Attendance</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ section_name }}</li>
+{% else %}
+<li class="breadcrumb-item active" aria-current="page">Attendance</li>
+{% endif %}
+{% endblock %}
+{% block aside %}
+<aside>
+    <h4>Sections</h4><hr/>
+    {% for section in sections %}
+        {% if section_id == section[0] | string %}
+    <p class="selected_sec">
+        {% else %}
+    <p>
+    {% endif %}
+        <a href="/{{ usrid }}/students/attendance/{{ section[0] }}">
+            {{ section[0] }}. {{ section[3] }} {{ section[1] }} {{ section[2] }}
+        </a>
+    </p><hr/>
+    {% endfor %}
+    <br><hr>
+    <p class="selected_sec">
+        <a href="/{{ usrid }}/students/attendance">
+            Mark Attendance
+        </a>
+    </p><hr>
+    <p>
+        <a href="/{{ usrid }}/students/attendance/report">
+            Attendance Report
+        </a>
+    </p>
+</aside>
+{% endblock %}
+{% block content %}
+<main class="sm-cont">
+    <div class="navbar alert alert-primary navbar-dark">
+        <h1 class="d-inline-block">Attendance</h1>
+    </div>
+    <div class="main">
+    {% if students %}
+        <form action="/{{ usrid }}/students/attendance/{{ section_id }}/mark?admin={{ admin }}" method="post">
+            <table class="table">
+                {% if admin == 1 %}
+                <tr>
+                    <th>Previous Attendance : </th>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Date
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% for attendance in attendances %}
+                                {% for lecture in lectures %}
+                                {% if lecture[0] == attendance[1] %}
+                                <li><a class="dropdown-item" href="/{{ usrid }}/students/attendance/{{ section_id }}/{{ attendance[0] }}">
+                                    {{ attendance[2] }}, {{ lecture[1] }}
+                                </a></li>
+                                {% endif %}
+                                {% endfor %}
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                    <th>Lectures : </th>
+                    <td colspan="3"><select class="form-select" name="lecture" id="lecture">
+                        {% for lecture in lectures %}
+                        <option value="{{ lecture[0] }}" id="lec_{{ lecture[0] }}" class="{{ lecture[4] }}"
+                        {% if curr_attendance %}{% if curr_attendance[0] == lecture[0] %}selected{% endif %}{% endif %}>
+                            {{ lecture[1] }} Period-{{ lecture[5] }}; {{ lecture[4] }}
+                        </option>
+                        {% endfor %}
+                    </select></td>
+                </tr>
+                {% endif %}
+                {% if lectures or admin == 1 %}
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Father</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Leave</th>
+                </tr>
+        {% for student in students %}
+                <tr>
+                    <td>{{ fall }}LNB{{ student[1] }}</td>
+                    <td>{{ student[2] }}</td>
+                    <td>{{ student[3] }}</td>
+                    <td><input
+                        type="radio"
+                        name="{{ student[0] }}attendance"
+                        id="{{ student[0] }}_present"
+                        value="P"
+                        {% for att_rec in stud_att %}{% if att_rec[2] == student[0] and att_rec[3] == 'P' %}checked{% endif %}{% endfor %}/></td>
+                    <td><input
+                        type="radio"
+                        name="{{ student[0] }}attendance"
+                        id="{{ student[0] }}_absent"
+                        value="A"
+                        {% for att_rec in stud_att %}{% if att_rec[2] == student[0] and att_rec[3] == 'A' %}checked{% endif %}{% endfor %}/></td>
+                    <td><input
+                        type="radio"
+                        name="{{ student[0] }}attendance"
+                        id="{{ student[0] }}_leave"
+                        value="L"
+                        {% for att_rec in stud_att %}{% if att_rec[2] == student[0] and att_rec[3] == 'L' %}checked{% endif %}{% endfor %}/></td>
+                </tr>
+        {% endfor %}
+            {% if admin == 1 %}
+                <tr>
+                    <td colspan="2">
+                        <label for="date"><Strong>Date :</Strong></label>
+                    </td>
+                    <td colspan="4"><input type="date" name="date" id="date" class="form-control"
+                        {% if curr_attendance %}value="{{ curr_attendance[1] }}"{% endif %}></td>
+                </tr>
+            {% endif %}
+                <tr>
+                    <td colspan="6">
+                        <input type="submit" value="Mark" class="btn btn-primary btn-sm"  style="width:100px;"/>
+                    </td>
+                </tr>
+        {% endif %}
+            </table>
+        </form>
+    {% endif %}
+    </div>
+</main>
+<script src="/static/Aside.js"></script>
+<script>
+    function intToDay(day_num){
+        switch(day_num){
+            case 1:
+                return "Monday";
+            case 2:
+                return "Tuesday";
+            case 3:
+                return "Wednesday";
+            case 4:
+                return "Thursday";
+            case 5:
+                return "Friday";
+            case 6:
+                return "Saturday";
+            case 7:
+                return "Sunday";
+        }
+    }
+    let date = document.getElementById("date");
+    date.addEventListener("input",function(){
+        var date_value = new Date(date.value);
+        var lect_value = document.getElementById("lecture").value
+        var lecture = document.getElementById("lec_"+lect_value);
+        if (intToDay(date_value.getDay()) != lecture.className){
+            alert("Can't select date instead of "+lecture.className);
+            date.value="";
+        }
+    })
+</script>
+{% endblock %}

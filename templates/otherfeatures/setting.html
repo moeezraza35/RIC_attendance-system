@@ -1,0 +1,88 @@
+{% extends "dashboard.html" %}
+{% block title %}settings{% endblock %}
+{% block style %}
+<style>
+    .showPass{
+        background-image: url("/static/icons/eyebtn.svg");
+        background-size: 28px 28px;
+        width: 30px;
+        height: 28px;
+        border: 1px outset gray;
+    }
+    #paswd{
+        width: 157px;
+    }
+    form{
+        text-align: center;
+    }
+    table{
+        margin-left: auto;
+        margin-right: auto;
+    }
+    td label{
+        width: 100%;
+        text-align: left;
+    }
+</style>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item active" aria-current="page"><a href="/">Dashboard</a></li>
+<li class="breadcrumb-item">Settings</li>
+{% endblock %}
+{% block content %}
+<main class="container-sm">
+    <div class="alert alert-primary">
+        <h1>Settings</h1>
+    </div>
+    <div class="main">
+        <form action="/{{ usrid }}/settings/update_profile" method="POST">
+            <table>
+                <tr>
+                    <td>
+                        <label for="name">Name :</label>
+                    </td>
+                    <td colspan="2">
+                        <input type="text" name="name" id="name" value="{{ usrnm }}"/>
+                    </td>
+                </tr>
+                    <td>
+                        <label for="paswd">Password :</label>
+                    </td>
+                    <td>
+                        <input type="password" name="password" id="paswd" value="{{ paswd }}"/>
+                    </td>
+                    <td>
+                        <button type="button" class="btn btn-sm showPass" onclick="show()"></button>
+                    </td>
+                </tr>
+                <tr>
+                    <td colspan="3">
+                        <input type="submit" value="Save changes" class="btn btn-primary"/>
+                    </td>
+                </tr>
+            </table>
+            {% with message = get_flashed_messages() %}
+            <p>
+                {{ message[0] }}
+            </p>
+            {% endwith %}
+        </form>
+    </div>
+</main>
+<script>
+    paswdBar = document.getElementById("paswd");
+    toggleBtn = document.querySelector(".showPass");
+    function show(){
+        if (paswdBar.type == "password"){
+            paswdBar.type="text";
+            toggleBtn.style.backgroundColor = "#0444FC";
+            toggleBtn.style.backgroundImage = "none";
+        }
+        else{
+            paswdBar.type="password";
+            toggleBtn.style.backgroundColor = "white";
+            toggleBtn.style.backgroundImage = "url('/static/icons/eyebtn.svg')"
+        };
+    };
+</script>
+{% endblock %}

@@ -1,0 +1,101 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        body{
+            padding: 20px;
+        }
+        h1{
+            font-size: 46px;
+            text-align: center;
+        }
+        table{
+            border-collapse: collapse;
+            width: 100%;
+            text-align: center;
+        }
+        table, table *{
+            border-style: solid;
+            border-width: 1px;
+        }
+        th, td{
+            font-size: 18px;
+            font-family: sans-serif;
+        }
+    </style>
+</head>
+<body>
+    <h1>
+        Riphah International College Thokar Campus
+    </h1>
+    <table border="1">
+{% if member == "all" %}
+        <tr class="table-secondary">
+            <th rowspan="2">Sr</th>
+            <th rowspan="2">Name</th>
+    {% for date in dateList %}
+            <th colspan="2">{{ date }}</th>
+    {% endfor %}
+        </tr>
+        <tr>
+    {% for date in dateList %}
+            <th>Time in</th>
+            <th>Time out</th>
+    {% endfor %}
+        </tr>
+    {% for rec in staf %}
+        <tr>
+            <td>{{ rec[0] }}</td>
+            <td>{{ rec[1] }}</td>
+            {% for item in report %}
+                {% if item[2] == rec[0] %}
+            <td> {{ item[3] }} </td>
+            <td> {{ item[4] }} </td>
+                {% endif %}
+            {% endfor %}
+        </tr>
+    {% endfor %}
+{% else %}
+        <tr>
+            <th>
+    {% for members in staf %}
+        {% if members[0] | string == member | string %}
+                {{ members[1] }}
+        {% endif %}
+    {% endfor %}
+            </th>
+            {% if status == "visiting" %}
+            <th colspan="5">
+                Visiting Faculty Attendance
+            </th>
+            {% else %}
+            <th colspan="3"></th>
+            {% endif %}
+        </tr>
+        <tr class="table-secondary">
+            <th>Date</th>
+            {% if status == "visiting" %}
+            <th>Section</th>
+            <th>Subject</th>
+            {% endif %}
+            <th>Time in</th>
+            <th>Time out</th>
+        </tr>
+    {% for rec in report %}
+        <tr>
+            <td>{{ rec[1] }}</td>
+        {% if status == "visiting" %}
+            <td>{{ rec[5] }}</td>
+            <td>{{ rec[6] }}</td>
+        {% endif %}
+            <td> {{ rec[3] }} </td>
+            <td> {{ rec[4] }} </td>  
+        </tr>
+    {% endfor %}
+{% endif %}
+    </table>
+</body>
+</html>

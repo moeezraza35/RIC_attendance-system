@@ -1,0 +1,93 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css">
+    <link rel="shortcut icon" href="/static/icons/Riphah-icon.png" type="image/x-icon">
+    <link rel="stylesheet" href="/static/header.css"/>
+    <link rel="stylesheet" href="/static/style.css">
+
+    <title>Riphah | Login</title>
+    <style>
+        .container{
+            border-radius: 20px;
+            border: 1px solid silver;
+            text-align: center;
+            box-shadow: silver 1px 3px 7px;
+            margin: 20px auto;
+        }
+        @media screen and (max-width:766px) {
+            .container{
+                width: 95%;
+                padding: 20px;
+            }
+        }
+        @media screen and (min-width:765px) {
+            .container{
+                width: 540px;
+                padding: 20px 50px;
+            }
+        }
+        form p{
+            margin: 0%;
+        }
+        form input{
+            width: 250px;
+        }
+        form input[type="submit"]{
+            padding: 5px;
+            color: white;
+            background-color: #25456e;
+            border: 1px outset #0C1C44;
+            border-radius: 10px;
+            transition: all 0.7s;
+        }
+        form input[type="submit"]:hover{
+            background-color: #234d83;
+        }
+        .error{
+            text-align: center;
+            height: 30px;
+            color: red;
+            padding: 5px;
+        }
+        .error span{
+            display: inline-block;
+            width: 250px;
+            text-align: left;
+        }
+    </style>
+</head>
+<body>
+    <header class="navbar">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="/static/icons/riphah-logo.png" alt="Logo" class="d-inline-block">
+                Riphah International College Thokar Campus
+            </a>
+        </div>
+    </header>
+    <hr/>
+    <form action="/login/request" method="POST" class="container">
+        {% with errors = get_flashed_messages() %}
+        <p>
+            <input type="text" name="usrid" id="usrnm" placeholder="Username . . ."/>
+        </p>
+        <p class="error">
+            <span>{% if errors[0] %}{{errors[0]}}{% endif %}</span>
+        </p>
+        <p>
+            <input type="password" name="password" id="paswd" placeholder="Password . . ."/>
+        </p>
+        <p class="error">
+            <span>{% if errors[1] %}{{errors[1]}}{% endif %}</span>
+        </p>
+        <p class="nomrg">
+            <input type="submit" value="Login"/>
+        </p>
+        {% endwith %}
+    </form>
+</body>
+</html>

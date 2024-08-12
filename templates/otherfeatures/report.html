@@ -1,0 +1,212 @@
+{% extends "otherfeatures/staf.html" %}
+{% block title %}Report{% endblock %}
+{% block style%}
+<style>
+    #selected_sub{
+        color: #0066cc;
+        background-color: rgb(220,220,220);
+    }
+    #selected_sub:hover{
+        background-color: rgb(230, 230, 230);
+    }
+    .card{
+        width: 18rem;
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+{% block addbreadcrumb %}
+<li class="breadcrumb-item"><a href="/{{ usrid }}/manage/staf">Staff</a></li>
+{% if report_of %}
+<li class="breadcrumb-item"><a href="/{{ usrid }}/manage/staf/report">Report</a></li>
+<li class="breadcrumb-item active" aria-current="page">Report {{ report_of }}</li>
+{% else %}
+<li class="breadcrumb-item active" aria-current="page">Report</li>
+{% endif %}
+{% endblock %}
+{% block aside %}
+<aside>
+    <h4>Option</h4><hr/>
+    <p>
+        <a href="/{{ usrid }}/manage/staf"><img src="/static/icons/manageIcon.svg">Manage</a>
+    </p><hr/>
+    <p>
+        <a href="/{{ usrid }}/manage/staf/attendance"><img src="/static/icons/attendanceIcom.svg">Update Attendance</a>
+    </p><hr/>
+    <p class="selected_sec">
+        <a href="/{{ usrid }}/manage/staf/report"><img src="/static/icons/report.svg">Attendance report</a>
+        <a class="sub" href="/{{ usrid }}/manage/staf/report/permanent">Permanent Staff</a><br>
+        <a class="sub" href="/{{ usrid }}/manage/staf/report/visiting">Visiting Staff</a>
+        <a class="sub" href="/{{ usrid }}/manage/staf/report/administration">Administration Staff</a>
+        <hr/>
+    </p>
+</aside>
+{% endblock %}
+{% block content %}
+<main class="sm-cont">
+    {% if status %}
+    <div class="alert alert-primary">
+        <h1>
+            Report of {{ status }} staff
+        </h1>
+    </div>
+    <div class="main">
+        <table class="table">
+            <tr>
+                <th>Of :</th>
+                <td>
+                    <select name="member" id="member" required>
+                        <option value="all">All</option>
+{% for members in staf %}
+                        <option value="{{ members[0] }}">{{ members[1] }}</option>
+{% endfor %}
+                    </select>
+                </td>
+                <th>From :</th>
+                <td>
+                    <select id="from" required>
+                        <option>Not Selected</option>
+{% for date in dates %}
+                        <option value="{{ date }}">{{ date }}</option>
+{% endfor %}
+                    </select>
+                </td>
+                <th>To :</th>
+                <td>
+                    <select id="to" required>
+                        <option>Not Selected</option>
+{% for date in dates %}
+                        <option value="{{ date }}">{{ date }}</option>
+{% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input type="button" value="Get Report" class="btn btn-primary btn-sm" onclick="getReport()"/>
+                </td>
+            </tr>
+        </table>
+{% if report %}
+        <hr/>
+        <table class="table table-striped-columns">
+    {% if member == "all" %}
+            <tr class="table-secondary">
+                <th rowspan="2">Sr</th>
+                <th rowspan="2">Name</th>
+        {% for date in dateList %}
+                <th colspan="2">{{ date }}</th>
+        {% endfor %}
+            </tr>
+            <tr>
+        {% for date in dateList %}
+                <th>Time in</th>
+                <th>Time out</th>
+        {% endfor %}
+            </tr>
+        {% for rec in staf %}
+            <tr>
+                <td>{{ rec[0] }}</td>
+                <td>{{ rec[1] }}</td>
+            {% for item in report %}
+                    {% if item[2] == rec[0] %}
+                <td> {{ item[3] }} </td>
+                <td> {{ item[4] }} </td>
+                    {% endif %}
+            {% endfor %}
+            </tr>
+        {% endfor %}
+        </table>
+        <div>
+            <a class="btn btn-success btn-lg" target="_blank" href="/{{ usrid }}/manage/staf/report/{{ status }}/{{ member }}/{{ dateFrom }}/to/{{ dateTo }}/print">Export to PDF</a>
+            <a class="btn btn-success btn-lg" target="_blank" href="/{{ usrid }}/manage/staf/report/{{ status }}/{{ member }}/{{ dateFrom }}/to/{{ dateTo }}/export">Export to CSV</a>
+        </div>
+    {% else %}
+            <tr>
+                <th>
+        {% for members in staf %}
+            {% if members[0] | string == member | string %}
+                    {{ members[1] }}
+            {% endif %}
+        {% endfor %}
+                </th>
+                {% if status == "visiting" %}
+                <th colspan="5">
+                    Visiting Faculty Attendance
+                </th>
+                {% else %}
+                <th colspan="3"></th>
+                {% endif %}
+            </tr>
+            <tr class="table-secondary">
+                <th>Date</th>
+                {% if status == "visiting" %}
+                <th>Section</th>
+                <th>Subject</th>
+                {% endif %}
+                <th>Time in</th>
+                <th>Time out</th>
+            </tr>
+        {% for rec in report %}
+            <tr>
+                <td>{{ rec[1] }}</td>
+                {% if status == "visiting" %}
+                <td>{{ rec[5] }}</td>
+                <td>{{ rec[6] }}</td>
+                {% endif %}
+                <td> {{ rec[3] }} </td>
+                <td> {{ rec[4] }} </td>
+            </tr>
+        {% endfor %}
+        </table>
+        <div>
+            <a class="btn btn-success btn-lg" target="_blank" href="/{{ usrid }}/manage/staf/report/{{ status }}/{{ member }}/{{ dateFrom }}/to/{{ dateTo }}/print">Export to PDF</a>
+            <a class="btn btn-success btn-lg" target="_blank" href="/{{ usrid }}/manage/staf/report/{{ status }}/{{ member }}/{{ dateFrom }}/to/{{ dateTo }}/export">Export to CSV</a>
+        </div>
+    {% endif %}
+{% endif %}
+    </div>
+    {% else %}
+    <div class="card">
+        <img src="/static/thumbnails/permanentStaff.png" class="card-img-top" alt="Posts"/>
+        <div class="card-body">
+            <h5 class="card-title">Permanent Staff</h5>
+            <a href="/{{ usrid }}/manage/staf/report/permanent" class="btn btn-primary">Attendance</a>
+        </div>
+    </div>
+    <div class="card">
+        <img src="/static/thumbnails/visitingStaff.png" class="card-img-top" alt="Posts"/>
+        <div class="card-body">
+            <h5 class="card-title">Visiting Staff</h5>
+            <a href="/{{ usrid }}/manage/staf/report/visiting" class="btn btn-primary">Attendance</a>
+        </div>
+    </div>
+    <div class="card">
+        <img src="/static/thumbnails/Sections1.png" class="card-img-top" alt="Posts"/>
+        <div class="card-body">
+            <h5 class="card-title">Administration Staff</h5>
+            <a href="/{{ usrid }}/manage/staf/report/administration" class="btn btn-primary">Attendance</a>
+        </div>
+    </div>
+    {% endif %}
+</main>
+{% block script %}
+<script src="/static/Aside.js"></script>
+<script>
+    let ToBox = document.getElementById("to");
+    let FromBox = document.getElementById("from");
+    let member = document.getElementById("member");
+    function getReport(){
+        var fromDate = FromBox.value;
+        var toDate = ToBox.value;
+        var memberId = member.value;
+        var goTo = "/{{ usrid }}/manage/staf/report/{{ status }}/";
+        goTo += memberId;
+        goTo += '/';
+        goTo += fromDate;
+        goTo += "/to/";
+        goTo += toDate;
+
+        window.open(goTo,"_self");
+    }
+</script>
+{% endblock %}
+{% endblock %}

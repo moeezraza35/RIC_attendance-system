@@ -1,0 +1,113 @@
+{% extends "dashboard.html" %}
+{% block title %}Sections{% endblock %}
+{% block style %}
+<style>
+    .d-inline-block{
+        margin: 0%;
+    }
+</style>
+{% endblock %}
+{% block toggeler %}
+<button class="navbar-toggler" type="button" onclick="show_hide_aside()">
+    <span class="navbar-toggler-icon"></span>
+</button>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="/{{ usrid }}#manage">Manage</a></li>
+{% if section_selected == 1 %}
+<li class="breadcrumb-item"><a href="/{{ usrid }}/manage/sections">Sections</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ section_name }}</li>
+{% else %}
+<li class="breadcrumb-item active" aria-current="page">Sections</li>
+{% endif %}
+{% endblock %}
+{% block aside %}
+<aside>
+    <h4>Sections</h4><hr>
+    {% for section in sections %}
+        {% if section_id == section[0] %}
+    <p class="selected_sec">
+        {% else %}
+    <p>
+        {% endif %}
+        <a href="/{{ usrid }}/manage/sections/{{ section[0] }}">
+            {{ section[0] }}. {{ section[3] }} {{ section[1] }} {{ section[2] }}
+        </a><hr>
+    </p>
+    {% endfor %}
+    {% if section_selected != 1 %}
+    <form action="/{{ usrid }}/manage/sections/import-csv/" method="POST" enctype="multipart/form-data">
+        <br>
+        <h4>Import CSV</h4>
+        <input type="file" name="students" id="csv_input" class="form-control" accept=".csv" required>
+        <input type="submit" value="Add" class="btn btn-success my-1 form-control">
+    </form>
+    {% else %}
+    <br><hr>
+    <p class="selected_sec">
+        <a href="/{{ usrid }}/manage/sections/{{ section_id }}">Students</a><hr>
+    </p>
+    <p>
+        <a href="/{{ usrid }}/manage/sections/{{ section_id }}/lectures">Lectures</a><hr>
+    </p>
+    {% endif %}
+</aside>
+{% endblock %}
+{% block content %}
+<main class="sm-cont">
+    <div class="alert alert-primary d-flex justify-content-between">
+        <h1 class="d-inline-block">Sections</h1>
+    {% if section_selected == 1 %}
+        <a href="/{{ usrid }}/manage/sections/{{ section_id }}/delete_section" class="btn btn-danger btn-lg">
+        Delete
+        </a>
+    {% endif %}
+    </div>
+    <div class="main">
+        <br>
+        <form action="/{{ usrid }}/manage/sections/create_new" method="POST" class="px-5">
+            <p class="left-align row">
+                <input type="text" class="col form-control mx-1" name="name" id="name" placeholder="Section name" required/>
+                <input type="text" class="col form-control mx-1" name="program" id="program" placeholder="Program" required/>
+                <input type="text" class="col form-control mx-1" name="fall" id="fall" placeholder="Fall" required/>
+                <input type="submit" class="btn btn-primary col form-control mx-1" value="Create new"/>
+            </p>
+        </form>
+        <!-- Students -->
+    {% if section_selected == 1 %}
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Name</th>
+                <th>Father</th>
+                <th>Option</th>
+            </tr>
+            {% for student in students %}
+            <tr>
+                <td>{{ fall }}LNB{{ student[1] }}</td>
+                <td>{{ student[2] }}</td>
+                <td>{{ student[3] }}</td>
+                <td>
+                    <a href="/{{ usrid }}/manage/sections/{{ section_id }}/delete/{{ student[0] }}" class="btn btn-danger btn-sm">
+                        Delete
+                    </a>
+                </td>
+            </tr>
+            {% endfor %}
+            <form action="/{{ usrid }}/manage/sections/{{ section_id }}/add_student" method="POST">
+                <tr>
+                   <td><input type="number" name="id" id="id" placeholder="student Id" required/></td>
+                   <td><input type="text" name="name" id="name" placeholder="Student Name" required/></td>
+                   <td><input type="text" name="father" id="father" placeholder="Father name" required/></td>
+                   <td><input type="submit" value="Add" class="btn btn-primary btn-sm"/></td>
+                </tr>
+            </form>
+        </table>
+    {% endif %}
+    </div>
+</main>
+{% block script %}
+<script src="/static/Aside.js"></script>
+{% endblock %}
+{% endblock %}

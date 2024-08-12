@@ -1,0 +1,124 @@
+{% extends "dashboard.html" %}
+{% block title %}Sections{% endblock %}
+{% block style %}
+<style>
+    .d-inline-block{
+        margin: 0%;
+    }
+</style>
+{% endblock %}
+{% block toggeler %}
+<button class="navbar-toggler" type="button" onclick="show_hide_aside()">
+    <span class="navbar-toggler-icon"></span>
+</button>
+{% endblock %}
+{% block breadcrumb %}
+<li class="breadcrumb-item"><a href="/">Dashboard</a></li>
+<li class="breadcrumb-item"><a href="/{{ usrid }}#manage">Manage</a></li>
+{% if section_selected == 1 %}
+<li class="breadcrumb-item"><a href="/{{ usrid }}/manage/sections">Sections</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ section_name }}</li>
+{% else %}
+<li class="breadcrumb-item active" aria-current="page">Sections</li>
+{% endif %}
+{% endblock %}
+{% block aside %}
+<aside>
+    <h4>Sections</h4><hr>
+    {% for section in sections %}
+        {% if section_id == section[0] %}
+    <p class="selected_sec">
+        {% else %}
+    <p>
+        {% endif %}
+        <a href="/{{ usrid }}/manage/sections/{{ section[0] }}/lectures">
+            {{ section[0] }}. {{ section[3] }} {{ section[1] }} {{ section[2] }}
+        </a><hr>
+    </p>
+    {% endfor %}
+    <br><hr>
+    <p>
+        <a href="/{{ usrid }}/manage/sections/{{ section_id }}">Students</a><hr>
+    </p>
+    <p class="selected_sec">
+        <a href="/{{ usrid }}/manage/sections/{{ section_id }}/lectures">Lectures</a><hr>
+    </p>
+</aside>
+{% endblock %}
+{% block content %}
+<main class="sm-cont">
+    <div class="alert alert-primary d-flex justify-content-between">
+        <h1 class="d-inline-block">Lectures</h1>
+    </div>
+    <div class="main">
+        <table class="table">
+            <tr>
+                <th>ID</th>
+                <th>Subject</th>
+                <th>Staff Member</th>
+                <th>Day</th>
+                <th>Period</th>
+                <th>Action</th>
+            </tr>
+            {% for lecture in lectures %}
+            <form action="/{{ usrid }}/manage/sections/lectures/update/{{ lecture[0] }}" method="POST">
+                <tr>
+                <td>{{ lecture[0] }}</td>
+                <td><input type="text" name="subject" value="{{ lecture[1] }}" class="form-control"></td>
+                <td><select name="member" class="form-select">
+                    {% for member in staff %}
+                    {% if member[0] == lecture[3] %}
+                    <option value="{{ member[0] }}" selected>
+                    {% else %}
+                    <option value="{{ member[0] }}">
+                    {% endif %}
+                    {{ member[1] }}</option>
+                    {% endfor %}
+                </select></td>
+                <td><select class="form-select" name="day">
+                    {% for day in days %}
+                    {% if lecture[4] == day %}
+                    <option value="{{ day }}" selected>
+                    {% else %}
+                    <option value="{{ day }}">
+                    {% endif %}{{ day }}</option>
+                    {% endfor %}
+                </select></td>
+                <td><input type="number" class="form-control" name="period" value="{{ lecture[5] }}"></td>
+                <td>
+                    <pre><input type="submit" class="btn btn-primary" value="Update"> <a href="/{{ usrid }}/manage/sections/lectures/delete/{{ lecture[0] }}" class="btn btn-danger">Delete</a></pre>
+                </td>
+                </tr>
+            </form>
+            {% endfor %}
+            <form class="row" method="POST" action="/{{ usrid }}/manage/sections/{{ section_id }}/lectures/add">
+                <td></td>
+                <td><input type="text" name="subject" id="subject" class="form-control"></td>
+                <td>
+                    <select name="member" id="member" class="form-select">
+                        {% for member in staff %}
+                        <option value="{{ member[0] }}">{{ member[1] }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <select name="day" id="day" class="form-select py-1">
+                        {% for day in days %}
+                        <option value="{{ day }}">{{ day }}</option>
+                        {% endfor %}
+                    </select>
+                </td>
+                <td>
+                    <input type="number" name="period" id="period" min="1" max="4" class="form-control">
+                </td>
+                <td>
+                    <input type="submit" value="Add" class="btn btn-primary">
+                </td>
+            </form>
+        </table>
+    </div>
+</main>
+{% block script %}
+<script src="/static/Aside.js"></script>
+{% endblock %}
+{% endblock %}

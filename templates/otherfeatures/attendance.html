@@ -1,0 +1,188 @@
+{% extends "otherfeatures/staf.html" %}
+{% block title %}Attendance{% endblock %}
+{% block style %}
+<style>
+    .left-align{
+        text-align: left;
+        padding: 10px;
+    }
+    .left-align *{
+        vertical-align: middle;
+    }
+    input[type="submit"]{
+        width: 288px;
+    }
+    .card{
+        width: 18rem;
+        display: inline-block;
+    }
+</style>
+{% endblock %}
+{% block addbreadcrumb %}
+<li class="breadcrumb-item"><a href="/{{ usrid }}/manage/staf">Staff</a></li>
+{% if status %}
+<li class="breadcrumb-item"><a href="/{{ usrid }}/manage/staf/attendance">Attendance</a></li>
+<li class="breadcrumb-item active" aria-current="page">{{ status }}</li>
+{% else %}
+<li class="breadcrumb-item active" aria-current="page">Attendance</li>
+{% endif %}
+{% endblock %}
+{% block aside %}
+<aside>
+    <h4>Option</h4><hr/>
+    <p>
+        <a href="/{{ usrid }}/manage/staf"><img src="/static/icons/manageIcon.svg">Manage</a>
+    </p><hr/>
+    <p class="selected_sec">
+        <a href="/{{ usrid }}/manage/staf/attendance"><img src="/static/icons/attendanceIcom.svg">Update Attendance</a>
+        <a class="sub" href="/{{ usrid }}/manage/staf/attendance/Permanent">Permanent Staff</a><br>
+        <a class="sub" href="/{{ usrid }}/manage/staf/attendance/Visiting">Visiting Staff</a>
+        <a class="sub" href="/{{ usrid }}/manage/staf/attendance/Administration">Administration Staff</a>
+    </p><hr/>
+    <p>
+        <a href="/{{ usrid }}/manage/staf/report"><img src="/static/icons/report.svg">Attendance report</a>
+        <hr/>
+    </p>
+</aside>
+{% endblock %}
+{% block content %}
+<main class="sm-cont">
+    {% if status %}
+    <div class="alert alert-primary">
+        <h1 class="d-inline-block">Attendance {{ status }} staff</h1>
+    </div>
+    <div class="main">
+        <form action="/{{ usrid }}/manage/staf/attendance/{{ status }}/mark" method="POST">
+            <table class="table">
+                <tr>
+                    <td colspan="2"></td>
+                </tr>
+                <tr>
+                    <td>
+                        <div class="dropdown">
+                            <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                                Date
+                            </button>
+                            <ul class="dropdown-menu">
+                                {% for dates in reports %}
+                                <li><a class="dropdown-item" href="/{{ usrid }}/manage/staf/attendance/{{ status }}/{{ dates }}">
+                                    {{ dates }}
+                                </a></li>
+                                {% endfor %}
+                            </ul>
+                        </div>
+                    </td>
+                    <td>
+                        <input type="date" name="date" id="date_selected" {% if date_selected %}value="{{ date_selected }}"{% endif %} required/>
+                    </td>
+                </tr>
+            </table>
+            <table class="table">
+                <tr>
+                    <th>ID</th>
+                    <th>Name</th>
+                    <th>Present</th>
+                    <th>Absent</th>
+                    <th>Leave</th>
+                    {% if Visiting == 1 %}
+                    <th>Section</th>
+                    <th>Subject</th>
+                    {% endif %}
+                    <th>Time in</th>
+                    <th>Time out</th>
+                </tr>
+                {% for member in staf %}
+                <tr>
+                    <td>{{ member[0] }}</td>
+                    <td>{{ member[1] }}</td>
+                    <td>
+                        <input type="radio" name="{{ member[0] }}attendance" id="{{ member[0] }}_present" value="present" onclick="disabler('{{ member[0] }}_time_in','{{ member[0] }}_time_out', 0{% if status == "Visiting" %}, '{{ member[0] }}program', '{{ member[0] }}subject' {% endif %})" {% for rec in record %}{% if rec[2] == member[0] and rec[3] | string != "Leave" and rec[4] | string != "Absent" %}checked{% endif %}{% endfor %} required/>
+                    </td>
+                    <td>
+                        <input type="radio" name="{{ member[0] }}attendance" id="{{ member[0] }}_absent" value="absent" onclick="disabler('{{ member[0] }}_time_in','{{ member[0] }}_time_out', 1{% if status == "Visiting" %}, '{{ member[0] }}program', '{{ member[0] }}subject' {% endif %})" {% for rec in record %}{% if rec[2] == member[0] and rec[3] | string == "Absent" %}checked{% endif %}{% endfor %} required/>
+                    </td>
+                    <td>
+                        <input type="radio" name="{{ member[0] }}attendance" id="{{ member[0] }}_leave" value="leave" onclick="disabler('{{ member[0] }}_time_in','{{ member[0] }}_time_out', 1{% if status == "Visiting" %}, '{{ member[0] }}program', '{{ member[0] }}subject' {% endif %})" {% for rec in record %}{% if rec[2] == member[0] and rec[3] | string == "Leave" %}checked{% endif %}{% endfor %} required/>
+                    </td>
+                    {% if Visiting == 1 %}
+                    <td>
+                        <select name="{{ member[0] }}program" id="{{ member[0] }}program">
+                            <option value="none">Not Selected</option>
+                            {% for section in sections %}
+                            <option value="{{ section[0] }}" {% for rec in record %}{% if rec[2] == member[0] and rec[5] | string == section[0] | string %} selected {% endif %}{% endfor %}>{{ section[0] }}. {{ section[3] }} {{ section[1] }} {{ section[2] }}</option>
+                            {% endfor %}
+                        </select>
+                    </td>
+                    <td>
+                        <input type="text" name="{{ member[0] }}subject" id="{{ member[0] }}subject" placeholder="Subject"{% for rec in record %}{% if rec[2] == member[0]%} value="{{ rec[6] }}" {% endif %}{% endfor %} required>
+                    </td>
+                    {% endif %}
+                    <td>
+                        <input type="time" name="{{ member[0] }}_time_in" id="{{ member[0] }}_time_in" {% for rec in record %}{% if rec[2] == member[0] %}{% if rec[3] | string != "Leave" and rec[3] | string != "Absent" %} value="{{ rec[3] }}" {% else %} disabled {% endif %}{% endif %}{% endfor %} required/>
+                    </td>
+                    <td>
+                        <input type="time" name="{{ member[0] }}_time_out" id="{{ member[0] }}_time_out" {% for rec in record %}{% if rec[2] == member[0] %}{% if rec[4] | string != "Leave" and rec[4] | string != "Absent" %} value="{{ rec[4] }}" {% else %} disabled {% endif %}{% endif %}{% endfor %} required/>
+                    </td>
+                </tr>
+                {% endfor %}
+            </table>
+            <p>
+                <input type="submit" value="Mark" class="btn btn-primary btn-sm"/>
+            </p>
+        </form>
+    </div>
+    {% else %}
+    <div class="card m-2">
+        <img src="/static/thumbnails/permanentStaff.png" class="card-img-top" alt="Posts"/>
+        <div class="card-body">
+            <h5 class="card-title">Permanent Staff</h5>
+            <a href="/{{ usrid }}/manage/staf/attendance/Permanent" class="btn btn-primary">Attendance</a>
+        </div>
+    </div>
+    <div class="card m-2">
+        <img src="/static/thumbnails/visitingStaff.png" class="card-img-top" alt="Posts"/>
+        <div class="card-body">
+            <h5 class="card-title">Visiting Staff</h5>
+            <a href="/{{ usrid }}/manage/staf/attendance/Visiting" class="btn btn-primary">Attendance</a>
+        </div>
+    </div>
+    <div class="card m-2">
+        <img src="/static/thumbnails/Sections1.png" class="card-img-top" alt="Posts"/>
+        <div class="card-body">
+            <h5 class="card-title">Administration Staff</h5>
+            <a href="/{{ usrid }}/manage/staf/attendance/Administration" class="btn btn-primary">Attendance</a>
+        </div>
+    </div>
+    {% endif %}
+</main>
+<script>
+    function disabler(time_in, time_out, option, section="", subject=""){
+        if(option == 1){
+            document.getElementById(time_in).disabled = true;
+            document.getElementById(time_in).required = false;
+            document.getElementById(time_out).disabled = true;
+            document.getElementById(time_out).required = false;
+            if(section != ""){
+                document.getElementById(section).disabled = true;
+                document.getElementById(section).required = false;
+                document.getElementById(subject).disabled = true;
+                document.getElementById(subject).required = false;
+            }
+        }else{
+            document.getElementById(time_in).disabled = false;
+            document.getElementById(time_in).required = true;
+            document.getElementById(time_out).disabled = false;
+            document.getElementById(time_out).required = true;
+            if(section != ""){
+                document.getElementById(section).disabled = false;
+                document.getElementById(section).required = true;
+                document.getElementById(subject).disabled = false;
+                document.getElementById(subject).required = true;
+            }
+        }
+    };
+</script>
+{% block script %}
+<script src="/static/Aside.js"></script>
+{% endblock %}
+{% endblock %}

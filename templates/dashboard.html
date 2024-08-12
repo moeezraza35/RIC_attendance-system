@@ -1,0 +1,118 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8"/>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+    
+    <link rel="stylesheet" href="/static/bootstrap/css/bootstrap.min.css"/>
+    <link rel="shortcut icon" href="/static/icons/Riphah-icon.png" type="image/x-icon"/>
+    <link rel="stylesheet" href="/static/header.css"/>
+    <link rel="stylesheet" href="/static/aside.css"/>
+    <link rel="stylesheet" href="/static/style.css"/>
+
+    <title>RIC Thokar | {% block title %}Dashboard{% endblock %}</title>
+    {% block style %}
+    <style>
+        .card{
+            width: 18rem;
+            display: inline-block;
+        }
+    </style>
+    {% endblock %}
+</head>
+<body>
+    <header class="navbar navbar-light">
+        <div class="container-fluid">
+            <a class="navbar-brand" href="/">
+                <img src="/static/icons/riphah-logo.png" alt="Logo" class="d-inline-block">
+                <span>Riphah International College Thokar Campus</span>
+            </a>
+            {% block dropdown %}
+            <div class="dropdown">
+                {% block toggeler %}{% endblock %}
+                <button class="btn dropdown-toggle" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                    <img src="/static/icons/ProfilePic.png" alt="Logo" class="d-inline-block align-text-top">
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                    <li><a class="dropdown-item" href="/">{{ usrnm }}</a></li>
+                    <li><a class="dropdown-item" href="/{{ usrid }}/settings">Settings</a></li>
+                    <li><a class="dropdown-item" href="/logout">Logout</a></li>
+                </ul>
+            </div>
+            {% endblock %}
+        </div>
+    </header>
+    {% block navBar %}
+    <div class="alert alert-primary container-sm" role="alert">
+        <nav aria-label="breadcrumb">
+            <ol class="breadcrumb">
+                {% block breadcrumb %}
+                <li class="breadcrumb-item active" aria-current="page">Dashboard</li>
+                {% endblock %}
+            </ol>
+        </nav>
+    </div>
+    {% endblock %}
+    <hr/>
+    {% block aside %}{% endblock %}
+{% block content %}
+    <main class="container-sm">
+    {% if manage == 1 %}
+        <div class="card m-2">
+            <img src="/static/thumbnails/staff.png" class="card-img-top" alt="Staf"/>
+            <div class="card-body">
+                <h5 class="card-title">Staff Attendance</h5>
+                <a href="/{{ usrid }}/manage/staf" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+        
+        <div class="card m-2">
+            <img src="/static/thumbnails/Sections.png" class="card-img-top" alt="Sections">
+            <div class="card-body">
+                <h5 class="card-title">Students Sections</h5>
+                <a href="/{{ usrid }}/manage/sections" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+    {% else %}
+        {% if staff == 1 %}
+        <div class="card m-2">
+            <img src="/static/thumbnails/staff.png" class="card-img-top" alt="Staf"/>
+            <div class="card-body">
+                <h5 class="card-title">Staff Attendance</h5>
+                <a href="/{{ usrid }}/manage/staf/attendance" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+        {% endif %}
+    {% endif %}
+    {% if attendance %}
+        <div class="card m-2">
+            <img src="/static/thumbnails/Attendance.png" class="card-img-top" alt="Attendance">
+            <div class="card-body">
+                <h5 class="card-title">Student Attendance</h5>
+                <a href="/{{ usrid }}/students/attendance" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+    {% endif %}
+    {% if examination %}
+        <div class="card m-2">
+            <img src="/static/thumbnails/examination.png" class="card-img-top" alt="Examination"/>
+            <div class="card-body">
+                <h5 class="card-title">Examination</h5>
+                <a href="/{{ usrid }}/students/examination" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+    {% endif %}
+    {% if post == 1 %}
+        <div class="card m-2">
+            <img src="/static/thumbnails/Posts.png" class="card-img-top" alt="Posts"/>
+            <div class="card-body">
+                <h5 class="card-title">Privilleges</h5>
+                <a href="/{{ usrid }}/manage/posts" class="btn btn-primary">Manage</a>
+            </div>
+        </div>
+    {% endif %}
+    </main>
+    {% endblock %}
+</body>
+{% block ScriptTag %}<script src="/static/bootstrap/js/bootstrap.bundle.min.js"></script>{% endblock %}
+</html>
